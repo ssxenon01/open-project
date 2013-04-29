@@ -15,7 +15,7 @@ Ext.define('Maniac.view.form.Base',{
 		        bodyPadding: 5,
 		        fieldDefaults: {
 		            msgTarget: 'side',
-		            labelWidth: 75
+		            labelWidth: 100
 		        },
 		        items:me.fields
 			}

@@ -2,8 +2,9 @@
 import webapp2
 import jinja2
 import os
-from google.appengine.api import users
+from google.appengine.api import users ,memcache
 from google.appengine.ext import db
+from google.appengine.api import memcache
 import cgi
 import datetime
 import logging
@@ -16,7 +17,11 @@ class BaseHanler(webapp2.RequestHandler):
         return jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
     def render_template(self, filename, args):
-        self.response.write(self.jinja2.get_template(filename).render(args))
+        out = memcache.get('render|%s'%filename)
+        if out is None:
+            out = self.jinja2.get_template(filename).render(args)
+            memcache.set('render|%s'%filename,out)
+        self.response.write(out)
 
 class MainPage(BaseHanler):
     def get(self):
@@ -35,42 +40,55 @@ class MainPage(BaseHanler):
 class ProjectHandler(BaseHanler):
     def get(*args):
         self = args[0]
-
-        response_json = []
-
+        result = []
         if len(args) == 1 :
             limit = int(self.request.get('limit')) if self.request.get('limit') else 20
             offset = int(self.request.get('start')) if self.request.get('start') else 0
-            for p in Project.all().run(limit=limit,offset=offset):
-                response_json.append({'id':p.key().id_or_name(),'name':p.name,'description':p.description,'priority':p.priority,'dateCreated':str(p.dateCreated),'lastUpdated':str(p.lastUpdated)})
-                self.response.headers['x-total-count'] = str(Project.all().count())
+
+            projects = memcache.get('%d:projects:%d' % (limit,offset))
+            if projects is not None:
+                result = projects
+            else:
+                for p in Project.all().run(limit=limit,offset=offset):
+                    result.append(p.toMap())
+
+                memcache.add('%d:projects:%d' % (limit,offset), result, 0)
+
+            self.response.headers['x-total-count'] = str(Project.all().count())
         elif len(args) == 2 :
-            p = Project.get(db.Key.from_path('Project',int(args[1])))
-            response_json = {'id':p.key().id_or_name(),'name':p.name,'description':p.description,'priority':p.priority,'dateCreated':str(p.dateCreated),'lastUpdated':str(p.lastUpdated)}
+            p = memcache.get('project:%s'%args[1])
+            if p is None:
+                p = Project.get(db.Key.from_path('Project',int(args[1])))
+                memcache.set('project:%s'%p.key().id_or_name(),p.toMap(),6000)
+                result = p.toMap()
+            else:
+                result = p
 
 
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(response_json))
+        self.response.out.write(json.dumps(result))
 
     def post(self):
         data = json.loads(self.request.body)
-        p = Project(name=data['name'] , description=data['description'] , priority=data['priority'])
+        p = Project().fromMap(data)
+        # p = Project(name=data['name'] , description=data['description'] , priority=data['priority'])
         p.put()
-        response_json = {'id':p.key().id_or_name(),'name':p.name,'description':p.description,'priority':p.priority,'dateCreated':str(p.dateCreated),'lastUpdated':str(p.lastUpdated)}
+        memcache.set('project:%s'%p.key().id_or_name(),p.toMap(),6000)
+        result = p.toMap()
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(response_json))
+        self.response.out.write(json.dumps(result))
 
     def put(self,id):
         data = json.loads(self.request.body)
         p = Project.get(db.Key.from_path('Project',int(id)))
-        # for property, value in vars(data).iteritems():
-            # print property, ": ", value
         for k in data:
-            setattr(p,k,data[k])
-
-        response_json = {'id':p.key().id_or_name(),'name':p.name,'description':p.description,'priority':p.priority,'dateCreated':str(p.dateCreated),'lastUpdated':str(p.lastUpdated)}
+            if data[k] is not None:
+                setattr(p,k,data[k])
+        p.put()
+        memcache.set('project:%s'%p.key().id_or_name(),p.toMap(),6000)
+        result = p.toMap()
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(response_json))
+        self.response.out.write(json.dumps(result))
 
     # TODO: add Security with custom permission
     def delete(self,id):

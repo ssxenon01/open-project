@@ -70,7 +70,7 @@ Ext.define('Maniac.view.Viewport',{
                     items:[ {text:'Нэмэх',role:'add'}]
                 },
                 columns: [
-                    { text: 'Нэр',  dataIndex: 'name' },
+                    { text: 'Нэр',  dataIndex: 'name',width:200 },
                     { text: 'Дэлгэрэнгүй', dataIndex: 'description', flex: 1 }
                 ]
             },
