@@ -1,0 +1,11 @@
+# indexes:
+
+# - kind: Project
+#   ancestor: no
+#   properties:
+#   - name: name
+#   - name: description
+#   - name: priority
+#   direction: asc
+#   - name: dateCreated
+#   - name: lastUpdated

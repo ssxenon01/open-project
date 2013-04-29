@@ -1,0 +1,24 @@
+application: opensourcemongolia
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /favicon\.ico
+  static_files: resources/img/favicon.ico
+  upload: resources/img/favicon\.ico
+- url: /app\.js
+  static_files: app.js
+  upload: app\.js
+- url: /resources
+  static_dir: resources
+- url: /app
+  static_dir: app
+- url: /.*
+  script: maniac.app
+
+
+libraries:
+- name: jinja2
+  version: latest
