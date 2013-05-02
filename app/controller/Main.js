@@ -1,9 +1,12 @@
 Ext.define('Maniac.controller.Main',{
 	extend:'Ext.app.Controller',
 	stores:['Project'],
+    refs:[
+        { ref: 'tabPanel', selector: 'viewport tabpanel' }
+    ],
 	init: function() {
          this.control({
-            'viewport grid':{itemdblclick:this.projectGridDblcick},
+            'viewport grid':{itemdblclick:this.projectGridDblcick,itemclick:this.projectGridClick},
          	'viewport grid toolbar button[role="add"]':{click:this.addProject}
          });
      },
@@ -17,6 +20,9 @@ Ext.define('Maniac.controller.Main',{
                 }
             }
         }).show();
+     },
+     projectGridClick:function(){
+        this.getTabPanel().add(Ext.create('Maniac.view.repo.Panel'));
      },
      addProject:function(){
      	var me = this;

@@ -29,7 +29,7 @@ Ext.define('Maniac.view.form.Base',{
 	},
 	buttons:[
 		{
-			text:'Submit',
+			text:'Хадгалах',
 			handler:function(v){
 				var me = v.up('window'),form = me.down('form').getForm();
 				if(form.isValid()){
@@ -57,7 +57,7 @@ Ext.define('Maniac.view.form.Base',{
 			}
 		},
 		{
-			text:'Close',
+			text:'Цуцлах',
 			handler:function(v){
 				v.up('window').close();
 			}

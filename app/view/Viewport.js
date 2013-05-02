@@ -105,7 +105,26 @@ Ext.define('Maniac.view.Viewport',{
                     {
                         flex:1,
                         xtype:'component',
-                        tpl:Ext.create('Ext.XTemplate','login: {login} <br>id: {id} <br>avatar_url: {avatar_url} <br>gravatar_id: {gravatar_id} <br>url: {url} <br>html_url: {html_url} <br>followers_url: {followers_url} <br>following_url: {following_url} <br>gists_url: {gists_url} <br>starred_url: {starred_url} <br>subscriptions_url: {subscriptions_url} <br>organizations_url: {organizations_url} <br>repos_url: {repos_url} <br>events_url: {events_url} <br>received_events_url: {received_events_url} <br>type: {type} <br>name: {name} <br>company: {company} <br>blog: {blog} <br>location: {location} <br>email: {email} <br>hireable: {hireable} <br>bio: {bio} <br>public_repos: {public_repos} <br>followers: {followers} <br>following: {following} <br>created_at: {created_at} <br>updated_at: {updated_at} <br>public_gists: {public_gists} <br>'),
+                        tpl:Ext.create('Ext.XTemplate',
+                            '<tpl for=".">',
+                                '<div class="info-box">',
+                                    '<h3> hello world</h3>',
+                                    '<ul class="event">',
+                                      '<li class="event-item js-navigation-item js-details-container">',
+                                        '<img class="gravatar" height="36" src="https://secure.gravatar.com/avatar/8e65b9c7d5bb8ab81644154e609cedc3?s=140&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png" width="36">',
+                                        '<p class="event-title">',
+                                          '<a href="/ssxenon01/feedback/commit/f7bd50e1c249ac9799cae15159855422d257ffee" class="message">FileUpload section fixed.</a>',
+                                        '</p>',
+                                        '<div class="commit-meta">',
+                                          '<div class="authorship">',
+                                            '<span class="author-name"><a href="/ssxenon01" rel="author">ssxenon01</a></span>',
+                                            'authored <time class="js-relative-date" datetime="2013-04-22T19:40:26-07:00" title="2013-04-22 19:40:26">6 days ago</time>',
+                                          '</div>',
+                                        '</div>',
+                                      '</li>',
+                                  '</ul>',
+                                '</div>',
+                            '</tpl>'),
                         data:{}
                     }
                 ]

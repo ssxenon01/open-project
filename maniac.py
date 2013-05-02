@@ -17,10 +17,13 @@ class BaseHanler(webapp2.RequestHandler):
         return jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
     def render_template(self, filename, args):
-        out = memcache.get('render|%s'%filename)
-        if out is None:
-            out = self.jinja2.get_template(filename).render(args)
-            memcache.set('render|%s'%filename,out)
+        if args is None:
+            out = self.jinja2.get_template(filename).render({})
+        else:
+            out = memcache.get('render|%s'%filename)
+            if out is None:
+                out = self.jinja2.get_template(filename).render(args)
+                memcache.set('render|%s'%filename,out)
         self.response.write(out)
 
 class MainPage(BaseHanler):
@@ -52,7 +55,7 @@ class ProjectHandler(BaseHanler):
                 for p in Project.all().run(limit=limit,offset=offset):
                     result.append(p.toMap())
 
-                memcache.add('%d:projects:%d' % (limit,offset), result, 0)
+                memcache.add('%d:projects:%d' % (limit,offset), result, 60)
 
             self.response.headers['x-total-count'] = str(Project.all().count())
         elif len(args) == 2 :
@@ -111,8 +114,14 @@ class OAuthHandler(BaseHanler):
     def post(self):
         logging.info(self.request.get('access_token'))
         self.redirect("/")
+
+class TestHandler(BaseHanler):
+    def get(self):
+        self.render_template('templates/test.jinja2',None)
+
 routes = [
     ('/', MainPage),
+    ('/test', TestHandler),
     ('/oauth',OAuthHandler),
     ('/api/project',ProjectHandler),
     (r'/api/project/(.*)',ProjectHandler),

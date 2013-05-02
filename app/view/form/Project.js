@@ -1,5 +1,6 @@
 Ext.define('Maniac.view.form.Project',{
 	requires:['Maniac.view.form.Base'],
+	title:'Төсөл',
 	extend:'Maniac.view.form.Base',
 	fields:[
 		{ fieldLabel: 'Төслийн нэр', name: 'name' },
